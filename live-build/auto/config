@@ -106,7 +106,7 @@ add_binary_hook ()
 
 if [ -z "${IMAGEFORMAT:-}" ]; then
 	case $PROJECT:$SUBPROJECT in
-		ubuntu-cpc:*)
+		ubuntu-cpc:*|ubuntu-base:*)
 			IMAGEFORMAT=ext4
 			;;
 		ubuntu-server:live)
@@ -619,6 +619,10 @@ case $ARCH in
 				add_package install linux-firmware-raspi2 u-boot-rpi flash-kernel u-boot-tools
 				BINARY_REMOVE_LINUX=false
 				;;
+			imx6)
+				COMPONENTS='main restricted universe multiverse'
+				add_package install flash-kernel u-boot-tools
+				BINARY_REMOVE_LINUX=false
 		esac
 		;;
 esac
@@ -633,14 +637,24 @@ case $PROJECT:$SUBPROJECT in
 		;;
 esac
 
-add_chroot_hook update-apt-file-cache
-add_chroot_hook update-apt-xapian-index
-add_chroot_hook update-mlocate-database
-add_chroot_hook remove-dbus-machine-id
-add_chroot_hook remove-openssh-server-host-keys
-add_chroot_hook remove-udev-persistent-rules
+#add_chroot_hook update-apt-file-cache
+#add_chroot_hook update-apt-xapian-index
+#add_chroot_hook update-mlocate-database
+#add_chroot_hook remove-dbus-machine-id
+#add_chroot_hook remove-openssh-server-host-keys
+#add_chroot_hook remove-udev-persistent-rules
 
 case $PROJECT in
+	ubuntu-base)
+		add_chroot_hook 999-raspi2-fixes
+		add_chroot_hook 999-undivert-sync
+		add_chroot_hook 02-add_user_to_groups
+		add_chroot_hook 01-setup_user
+		add_chroot_hook 15-remove-grub-common
+		add_binary_hook 032-disk-image
+		add_binary_hook 040-qcow2-image
+		add_package install net-tools network-manager
+		;;
 	# if any flavours want to strip .pyc files from their live images, add them here
 	_)
 		add_chroot_hook remove-python-py
@@ -677,6 +691,15 @@ echo "LB_BINARY_HOOKS=\"$BINARY_HOOKS\"" >> config/binary
 echo "BUILDSTAMP=\"$NOW\"" >> config/binary
 
 case $ARCH+$SUBARCH in
+	armhf+imx6)
+		cat > config/hooks/999-imx6-fixes.chroot <<EOF
+#!/bin/sh -ex
+cat >> /etc/fstab << EOM
+LABEL=system-boot       /boot/firmware  vfat    defaults        0       1
+LABEL=base-rootfs	/		ext4	defaults	0	1
+EOM
+EOF
+		;;
 	armhf+raspi2)
 		cat > config/hooks/01-firmware-directory.chroot_early <<EOF
 #!/bin/sh -ex
@@ -689,7 +712,7 @@ LABEL=system-boot       /boot/firmware  vfat    defaults        0       1
 EOM
 
 cat > /boot/firmware/cmdline.txt << EOM
-net.ifnames=0 dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait
+net.ifnames=0 dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 rw elevator=deadline rootwait
 EOM
 
 cat > /boot/firmware/config.txt << EOM
@@ -803,8 +826,8 @@ EOF
 		fi
 		;;
 
-	ubuntu-touch:*|ubuntu-touch-custom:*|ubuntu-core:system-image|ubuntu-desktop-next:system-image|ubuntu-cpc:*|ubuntu-server:live)
-		cp -af /usr/share/livecd-rootfs/live-build/${PROJECT}/* \
+	ubuntu-touch:*|ubuntu-touch-custom:*|ubuntu-core:system-image|ubuntu-desktop-next:system-image|ubuntu-cpc:*|ubuntu-server:live|ubuntu-base:*)
+		cp -af /home/ubuntu/livecd-rootfs/live-build/${PROJECT}/* \
 			config/
 		;;
 esac
