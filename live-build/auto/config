@@ -34,7 +34,7 @@ if [ -z "$MIRROR" ]; then
 fi
 
 mkdir -p config
-cp -af /usr/share/livecd-rootfs/live-build/functions config/functions
+cp -af ${OEM_PROJECT_ROOT}/live-build/functions config/functions
 
 mkdir -p config/package-lists
 
@@ -827,7 +827,7 @@ EOF
 		;;
 
 	ubuntu-touch:*|ubuntu-touch-custom:*|ubuntu-core:system-image|ubuntu-desktop-next:system-image|ubuntu-cpc:*|ubuntu-server:live|ubuntu-base:*)
-		cp -af /home/ubuntu/livecd-rootfs/live-build/${PROJECT}/* \
+		cp -af ${OEM_PROJECT_ROOT}/live-build/${PROJECT}/* \
 			config/
 		;;
 esac
