@@ -1,0 +1,30 @@
+#!/bin/bash -ex
+
+case $IMAGE_TARGETS in
+	""|*qcow2*)
+		;;
+	*)
+		echo "Skipping qcow2 image build"
+		exit 0
+		;;
+esac
+
+case $ARCH:$SUBARCH in
+	# Not sure if any other cloud images use subarch for something that
+	# should take qcow2 format, so only skipping this on raspi2 for now.
+	armhf:raspi2|armhf:imx6)
+		apt-get install -qqy pxz
+		pxz -T4 -c binary/boot/disk.ext4 > livecd.ubuntu-server.disk1.img.xz
+	        exit 0
+		;;
+esac
+
+apt-get install -qqy qemu-utils
+
+. config/functions
+
+if [ -f binary/boot/disk-uefi.ext4 ]; then
+    convert_to_qcow2 binary/boot/disk-uefi.ext4 livecd.ubuntu-server.img
+elif [ -f binary/boot/disk.ext4 ]; then
+    convert_to_qcow2 binary/boot/disk.ext4 livecd.ubuntu-server.img
+fi
