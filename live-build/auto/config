@@ -659,9 +659,9 @@ case $PROJECT in
 		add_chroot_hook 01-setup_user
 		add_chroot_hook 02-add_user_to_groups
 		add_chroot_hook 15-remove-grub-common
-		add_chroot_hook 99-fix-resolvconf
 		add_chroot_hook 999-raspi2-fixes
 		add_chroot_hook 999-undivert-sync
+		add_binary_hook 031-fix-resolvconf
 		add_binary_hook 032-disk-image
 		add_binary_hook 040-qcow2-image
 		;;
