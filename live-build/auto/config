@@ -618,6 +618,8 @@ case $ARCH in
 				COMPONENTS='main restricted universe multiverse'
 				add_package install linux-raspi2 linux-firmware-raspi2 u-boot-rpi flash-kernel u-boot-tools
 				BINARY_REMOVE_LINUX=false
+				# add hook script for raspi2
+				add_chroot_hook 999-raspi2-fixes
 				;;
 			imx6)
 				COMPONENTS='main restricted universe multiverse'
@@ -646,11 +648,11 @@ esac
 
 case $PROJECT in
 	ubuntu-base)
-		add_chroot_hook 999-raspi2-fixes
-		add_chroot_hook 999-undivert-sync
-		add_chroot_hook 02-add_user_to_groups
 		add_chroot_hook 01-setup_user
+		add_chroot_hook 02-add_user_to_groups
 		add_chroot_hook 15-remove-grub-common
+		add_chroot_hook 15-remove-apt-sourcelist
+		add_chroot_hook 999-undivert-sync
 		add_binary_hook 032-disk-image
 		add_binary_hook 040-qcow2-image
 		add_package install net-tools network-manager
@@ -659,11 +661,14 @@ case $PROJECT in
 		add_chroot_hook 01-setup_user
 		add_chroot_hook 02-add_user_to_groups
 		add_chroot_hook 15-remove-grub-common
-		add_chroot_hook 999-raspi2-fixes
+		add_chroot_hook 15-remove-apt-sourcelist
 		add_chroot_hook 999-undivert-sync
 		add_binary_hook 031-fix-resolvconf
 		add_binary_hook 032-disk-image
 		add_binary_hook 040-qcow2-image
+		;;
+	ubuntu)
+		add_chroot_hook 15-remove-apt-sourcelist
 		;;
 	# if any flavours want to strip .pyc files from their live images, add them here
 	_)
@@ -836,7 +841,7 @@ EOF
 		fi
 		;;
 
-	ubuntu-touch:*|ubuntu-touch-custom:*|ubuntu-core:system-image|ubuntu-desktop-next:system-image|ubuntu-cpc:*|ubuntu-server:*|ubuntu-base:*)
+	ubuntu-touch:*|ubuntu-touch-custom:*|ubuntu-core:system-image|ubuntu-desktop-next:system-image|ubuntu-cpc:*|ubuntu-server:*|ubuntu-base:*|ubuntu:*)
 		cp -af ${OEM_PROJECT_ROOT}/live-build/${PROJECT}/* \
 			config/
 		;;
