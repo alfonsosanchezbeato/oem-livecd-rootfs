@@ -41,7 +41,9 @@ clean_loops() {
 
 create_empty_disk_image() {
     # Prepare an empty disk image
-    dd if=/dev/zero of="$1" bs=1 count=0 seek="${imagesize}"
+    param=$2
+    size=${param:-$imagesize}
+    dd if=/dev/zero of="$1" bs=1 count=0 seek="${size}"
 }
 
 make_ext4_partition() {
