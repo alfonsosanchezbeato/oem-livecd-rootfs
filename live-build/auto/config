@@ -412,6 +412,10 @@ case $PROJECT in
 	ubuntu-server)
 		add_task install minimal
 		case $SUBPROJECT in
+			system-image)
+				add_task install standard
+				add_task install server
+				;;
 			live)
 				add_task install standard
 				add_task install server
@@ -571,6 +575,18 @@ case $PROJECT in
 esac
 
 case $ARCH in
+	arm64)
+		KERNEL_FLAVOURS="${SUBARCH:-$KERNEL_FLAVOURS}"
+		case $SUBARCH in
+			snapdragon)
+				COMPONENTS='main restricted universe multiverse'
+				add_package install linux-firmware-snapdragon u-boot-tools
+				BINARY_REMOVE_LINUX=false
+				# add hook script for snapdragon
+				add_chroot_hook 999-snapdragon-fixes
+				;;
+		esac
+		;;
 	armel|armhf)
 		KERNEL_FLAVOURS="${SUBARCH:-$KERNEL_FLAVOURS}"
 		case $SUBARCH in
@@ -706,6 +722,19 @@ echo "LB_BINARY_HOOKS=\"$BINARY_HOOKS\"" >> config/binary
 echo "BUILDSTAMP=\"$NOW\"" >> config/binary
 
 case $ARCH+$SUBARCH in
+	arm64+snapdragon)
+		cat > config/hooks/01-firmware-directory.chroot_early <<EOF
+#!/bin/sh -ex
+mkdir -p /boot/firmware
+EOF
+		cat > config/hooks/999-snapdragon-fixes.chroot <<EOF
+#!/bin/sh -ex
+cat >> /etc/fstab << EOM
+LABEL=system-boot       /boot/firmware  vfat    defaults        0       1
+LABEL=base-rootfs	/		ext4	defaults	0	1
+EOM
+EOF
+		;;
 	armhf+imx6)
 		cat > config/hooks/999-imx6-fixes.chroot <<EOF
 #!/bin/sh -ex
