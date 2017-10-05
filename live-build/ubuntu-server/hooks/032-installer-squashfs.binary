@@ -6,6 +6,7 @@
 set -x
 
 echo "032-installer-squashfs.binary"
+exit 0
 
 case $IMAGE_TARGETS in
 	""|*squashfs*)
