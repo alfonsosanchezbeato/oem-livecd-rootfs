@@ -5,6 +5,7 @@
 
 set -x
 echo "030-root-squashfs.binary"
+exit 0
 
 case $IMAGE_TARGETS in
 	""|*squashfs*)

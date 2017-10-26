@@ -655,39 +655,14 @@ case $PROJECT:$SUBPROJECT in
 		;;
 esac
 
-#add_chroot_hook update-apt-file-cache
-#add_chroot_hook update-apt-xapian-index
-#add_chroot_hook update-mlocate-database
-#add_chroot_hook remove-dbus-machine-id
-#add_chroot_hook remove-openssh-server-host-keys
-#add_chroot_hook remove-udev-persistent-rules
+add_chroot_hook update-apt-file-cache
+add_chroot_hook update-apt-xapian-index
+add_chroot_hook update-mlocate-database
+add_chroot_hook remove-dbus-machine-id
+add_chroot_hook remove-openssh-server-host-keys
+add_chroot_hook remove-udev-persistent-rules
 
 case $PROJECT in
-	ubuntu-base)
-		add_chroot_hook 01-setup_user
-		add_chroot_hook 02-add_user_to_groups
-		add_chroot_hook 15-remove-grub-common
-		add_chroot_hook 15-remove-apt-sourcelist
-		add_chroot_hook 999-undivert-sync
-		add_binary_hook 032-disk-image
-		add_binary_hook 040-qcow2-image
-		add_package install net-tools network-manager
-		;;
-	ubuntu-server)
-		add_chroot_hook 01-setup_user
-		add_chroot_hook 02-add_user_to_groups
-		add_chroot_hook 15-remove-grub-common
-		add_chroot_hook 15-remove-apt-sourcelist
-		add_chroot_hook 99-build-stamp
-		add_chroot_hook 99-fix-resolvconf
-		add_chroot_hook 999-undivert-sync
-		add_binary_hook 032-disk-image
-		add_binary_hook 040-qcow2-image
-		;;
-	ubuntu)
-		add_chroot_hook 15-remove-apt-sourcelist
-		add_chroot_hook 99-build-stamp
-		;;
 	# if any flavours want to strip .pyc files from their live images, add them here
 	_)
 		add_chroot_hook remove-python-py
