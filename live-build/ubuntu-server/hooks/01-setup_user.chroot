@@ -2,7 +2,7 @@
 
 set -e
 
-USER=u
+USER=oem
 UGID=1000
 
 echo "I: creating default user $USER"
