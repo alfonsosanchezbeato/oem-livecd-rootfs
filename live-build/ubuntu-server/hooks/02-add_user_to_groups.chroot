@@ -1,6 +1,6 @@
 #!/bin/sh -x
 
-USER=u
+USER=oem
 
 DEFGROUPS="sudo,adm,dialout,cdrom,plugdev,audio,dip,video"
 
