@@ -9,7 +9,6 @@ Vcs-Bzr: http://bazaar.launchpad.net/~ubuntu-core-dev/livecd-rootfs/trunk
 Package: livecd-rootfs
 Architecture: any
 Depends: ${misc:Depends},
-         android-tools-fsutils [armhf],
          apt-utils,
          debootstrap,
          dosfstools,
@@ -36,7 +35,6 @@ Depends: ${misc:Depends},
          vmdk-stream-converter [amd64 i386],
          xz-utils,
          zerofree
-Suggests: partimage
 Breaks: ubuntu-defaults-builder (<< 0.32)
 Description: construction script for the livecd rootfs
  livecd-rootfs provides the script used to create the root filesystem

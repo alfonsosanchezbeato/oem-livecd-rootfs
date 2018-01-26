@@ -21,8 +21,9 @@ PREFIX="livecd.$PROJECT${SUBARCH:+-$SUBARCH}"
 if [ "${IMAGEFORMAT:-}" = "ubuntu-image" ]; then
 	# Use ubuntu-image instead of live-build
 
+	CHANNEL="${CHANNEL:-edge}"
 	env SNAPPY_STORE_NO_CDN=1 \
-	ubuntu-image -c edge $UBUNTU_IMAGE_ARGS \
+	ubuntu-image -c "$CHANNEL" $UBUNTU_IMAGE_ARGS \
 		-o "$PREFIX".img "$PREFIX".model-assertion
 	xz -0 -T4 "$PREFIX".img
 	mv seed.manifest "$PREFIX".manifest
@@ -835,7 +836,11 @@ if [ "$NUMFLAVOURS" = 1 ] && [ "$LB_LINUX_FLAVOURS" != "none" ]; then
 	fi
 fi
 
+<<<<<<< HEAD
 if [ "$SUBARCH" = "ac100" ] || [ "$SUBARCH" = "nexus7" ]; then
+=======
+if [ "$SUBARCH" = "ac100" ]; then
+>>>>>>> 75ff5725e6f72f34806ec95ac444c46308d4a28e
 	# create the md5sum and size files for which we are actually doing all this
 	md5sum $PREFIX.rootfs.tar.gz >chroot/installer.md5
 	wc -c $PREFIX.rootfs.tar.gz >chroot/installer.size
@@ -856,6 +861,7 @@ if [ "$SUBARCH" = "ac100" ] || [ "$SUBARCH" = "nexus7" ]; then
 	# create boot.img
 	Chroot chroot "abootimg --create /boot/installer-${KVERS}.img -f /boot/bootimg.cfg-$SUBARCH -r /boot/initrd.img-${KVERS} -k /boot/vmlinuz-${KVERS}"
 
+<<<<<<< HEAD
 	if [ "$SUBARCH" = "nexus7" ]; then
 		# roll the android rootfs images
 		mkdir -p userdata
@@ -865,6 +871,8 @@ if [ "$SUBARCH" = "ac100" ] || [ "$SUBARCH" = "nexus7" ]; then
 		ln -sf "$PREFIX.ext4-$FLAVOUR" "$PREFIX.ext4"
 	fi
 
+=======
+>>>>>>> 75ff5725e6f72f34806ec95ac444c46308d4a28e
 	# clean up
 	lb chroot_devpts remove "$@"
 	lb chroot_sysfs remove "$@"
