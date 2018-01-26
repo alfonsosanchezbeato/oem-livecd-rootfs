@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -ex
+
+export LC_ALL=C 
+
+INFO_STRING="$(lsb_release -d -s) - $(dpkg --print-architecture) ($(date +%Y%m%d-%H:%M))"
+echo I: INFO_STRING: $INFO_STRING
+echo "$INFO_STRING" > /etc/media-info
