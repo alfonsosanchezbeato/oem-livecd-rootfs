@@ -21,6 +21,15 @@ if [ -n "$SUBARCH" ]; then
 	exit 0
 fi
 
+case $PROJECT:$SUBPROJECT in
+	ubuntu-server:live)
+		;;
+	*)
+		echo "Skipping rootfs build for non-live build"
+		exit 0
+		;;
+esac
+
 . config/functions
 
 SQUASH_ROOT=binary/boot/squashfs.dir
