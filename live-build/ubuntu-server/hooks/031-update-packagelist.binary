@@ -1,0 +1,38 @@
+#!/bin/bash -ex
+# vi: ts=4 noexpandtab
+#
+# Generate a squashfs root and manifest
+
+set -x
+
+echo "99-update-packagelist.binary"
+
+. config/functions
+
+SQUASH_ROOT=binary/boot/squashfs.dir
+
+setup_mountpoint binary/boot/squashfs.dir
+
+chroot $SQUASH_ROOT sh -c '
+echo "deb http://archive.ubuntu.com/ubuntu/ bionic restricted" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ bionic universe" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ bionic multiverse" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ bionic-updates restricted" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ bionic-updates universe" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ bionic-updates multiverse" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ bionic-security restricted" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ bionic-security universe" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ bionic-security multiverse" >> /etc/apt/sources.list
+'
+chroot $SQUASH_ROOT apt-get update
+chroot $SQUASH_ROOT apt-get -y install git
+
+chroot $SQUASH_ROOT sh -c '
+set -x;
+git clone https://github.com/woodrow-shen/ubuntu-manifest-parse.git
+cd ubuntu-manifest-parse
+./merge-packagelist.sh
+'
+cp $SQUASH_ROOT/ubuntu-manifest-parse/bionic-classic.list ${PWD}
+
+teardown_mountpoint "$SQUASH_ROOT"
