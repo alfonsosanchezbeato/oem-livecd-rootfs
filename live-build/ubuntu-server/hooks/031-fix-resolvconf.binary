@@ -1,7 +1,0 @@
-#!/bin/sh
-
-set -e
-
-echo "I: 31-fix-resolvconf"
-
-ln -snf /run/resolvconf/resolv.conf chroot/etc/resolv.conf
