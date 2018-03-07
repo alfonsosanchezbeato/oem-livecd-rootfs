@@ -116,6 +116,12 @@ if [ -z "${IMAGEFORMAT:-}" ]; then
 	esac
 fi
 
+skip_lb_stage() {
+	STAGE="$1"
+	mkdir -p .build
+	touch ".build/$STAGE"
+}
+
 case $IMAGEFORMAT in
 	ext2|ext3|ext4)
 		OPTS="${OPTS:+$OPTS }--initramfs none --chroot-filesystem $IMAGEFORMAT"
@@ -141,7 +147,9 @@ case $IMAGEFORMAT in
 		INITRAMFS_TYPE=none
 		case $PROJECT:${SUBPROJECT:-} in
 			ubuntu-server:live)
-				add_package live lupin-casper
+				# Stop lb installing casper into filesystem.squashfs
+				#  by skipping lb_chroot_live-packages.
+				skip_lb_stage chroot_live-packages
 				INITRAMFS_TYPE=auto
 				;;
 			*)
@@ -687,6 +695,20 @@ if [ -n "${BASE_SEED}" ]; then
 	done
 	if [ -n "${ALL_SNAPS}" ] || [ -n "${HOOK_SNAPS}" ]; then
 		echo "${ALL_SNAPS}" > config/seeded-snaps
+	fi
+fi
+
+# grab a list of packags to remove for a "minimal" installation from the seed
+# mirror for this project
+if [ -n "${BASE_SEED}" ] && [ -n "${BASE_SEED}" ]; then
+	minimal_packages_url=${SEEDMIRROR}/${SEED}/${BASE_SEED}.minimal-remove
+	echo -n "Checking ${minimal_packages_url} for a minimal installation list... "
+	minimal_packages_remove=$(wget -q -O- ${minimal_packages_url} | sed -e '/\s*#.*$/d' -e '/^\s*$/d')
+	if [ -n "${minimal_packages_remove}" ]; then
+		echo "${minimal_packages_remove}" > config/manifest-minimal-remove
+		echo "$(echo ${minimal_packages_remove} | tr '\n' ' ')"
+	else
+		echo "failed to retrieve, not including."
 	fi
 fi
 

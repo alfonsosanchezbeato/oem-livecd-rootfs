@@ -1,3 +1,46 @@
+livecd-rootfs (2.509) bionic; urgency=medium
+
+  [ Steve Langasek ]
+  * Properly handle loop device names when there are > 10 devices on the
+    system.
+
+  [ Dimitri John Ledkov ]
+  * Build EFI armhf images.
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Tue, 06 Mar 2018 12:58:46 +0000
+
+livecd-rootfs (2.508) bionic; urgency=medium
+
+  * Use Ubuntu-specific branches when seeding snaps, as required in
+    <https://wiki.ubuntu.com/UbuntuSeededSnaps>.
+  * Add dependency on distro-info for the above.
+
+ -- Steve Langasek <steve.langasek@ubuntu.com>  Tue, 06 Mar 2018 10:15:43 +0100
+
+livecd-rootfs (2.507) bionic; urgency=medium
+
+  * ubuntu-server: generate multi-lowerdir overlayfs for
+    maas-rack-controller, and full maas. To be used in subiquity for maas
+    install options.
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Wed, 28 Feb 2018 13:11:03 +0000
+
+livecd-rootfs (2.506) bionic; urgency=medium
+
+  * live-build-auto/{build,config}: Support fetching a file from the seed
+    mirror (BASE_SEED.minimal-remove) and putting it into the livefs build as
+    filesystem.manifest-minimal-remove. It's intended for ubiquity to read
+    this file as a list of packages to remove when doing a 'minimal' desktop
+    installation.
+
+ -- Iain Lane <iain.lane@canonical.com>  Fri, 23 Feb 2018 15:37:42 +0000
+
+livecd-rootfs (2.505) bionic; urgency=medium
+
+  * Move casper from filesystem.squashfs to installer.squashfs. 
+
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Fri, 23 Feb 2018 16:54:51 +1300
+
 livecd-rootfs (2.504) bionic; urgency=medium
 
   * Override JobRunningTimeoutSec to 0s on the .device unit that
