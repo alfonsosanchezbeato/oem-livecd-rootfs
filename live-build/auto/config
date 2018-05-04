@@ -323,6 +323,12 @@ if ! [ -e config/germinate-output/structure ]; then
 fi
 
 case $PROJECT in
+        base|edubuntu|edubuntu-dvd|kubuntu|kubuntu-active|kubuntu-dvd|kubuntu-plasma5|lubuntu|lubuntu-next|mythbuntu|ubuntu|ubuntu-budgie|ubuntu-desktop-next|ubuntu-dvd|ubuntu-gnome|ubuntu-mate|ubuntu-netbook|ubuntukylin|ubuntustudio-dvd|xubuntu)
+		INITRAMFS_COMPRESSION="lzma"
+		;;
+esac
+
+case $PROJECT in
 	ubuntu|ubuntu-dvd)
 		add_task install minimal standard ubuntu-desktop
 		LIVE_TASK='ubuntu-live'
@@ -559,7 +565,6 @@ case $PROJECT in
 				;;
 		esac
 		OPTS="${OPTS:+$OPTS }--linux-packages=none --initramfs=none"
-		INITRAMFS_COMPRESSION="none"
 
 		# contains the framework definition
 		add_package install ubuntu-core-libs
@@ -624,10 +629,10 @@ case $PROJECT in
 			# linux-kvm is available since you control the
 			# archive and can provide this metapackage as
 			# necessary.
-			if [ "$ARCH" != "amd64" ] || ([ -z "$EXTRA_PPAS" ] && [ "$SUITE" != xenial ]); then
-				KERNEL_FLAVOURS=virtual
-			else
+			if [ "$ARCH" = "amd64" ] && ([ -n "$EXTRA_PPAS" ] || [ "$SUITE" = xenial ] || [ "$SUITE" = bionic ]); then
 				KERNEL_FLAVOURS=kvm
+			else
+				KERNEL_FLAVOURS=virtual
 			fi
 		else
 			add_task install minimal standard cloud-image
@@ -655,7 +660,6 @@ case $PROJECT in
 		OPTS="${OPTS:+$OPTS }--hdd-label=cloudimg-rootfs"
 		OPTS="${OPTS:+$OPTS }--ext-resize-blocks=536870912 --ext-block-size=4096"
 		OPTS="${OPTS:+$OPTS }--ext-fudge-factor=15"
-		INITRAMFS_COMPRESSION="gzip"
 		;;
 
 	*)
@@ -667,8 +671,14 @@ esac
 # we'll expand the base seed given here according to the STRUCTURE file, and
 # then look in all of the seeds found to see which snaps are seeded
 case $PROJECT:${SUBPROJECT:-} in
-	ubuntu:*|kubuntu*:*|lubuntu*:*|xubuntu*:*|ubuntu-mate*:*|ubuntustudio*:*|ubuntukylin*:*|ubuntu-budgie*:*)
+	ubuntu:*|kubuntu*:*|xubuntu*:*|ubuntu-mate*:*|ubuntustudio*:*|ubuntukylin*:*|ubuntu-budgie*:*)
 		BASE_SEED='desktop'
+		;;
+	lubuntu-next:*)
+		BASE_SEED='desktop-qt'
+		;;
+	lubuntu:*)
+		BASE_SEED='desktop-gtk'
 		;;
 	ubuntu-server:live)
 		BASE_SEED='server'
@@ -817,7 +827,7 @@ lb config noauto \
 	${KERNEL_FLAVOURS:+--linux-flavours "$KERNEL_FLAVOURS"} \
 	--initsystem none \
 	--bootloader "$BOOTLOADER" \
-	--initramfs-compression "${INITRAMFS_COMPRESSION:-lzma}" \
+	${INITRAMFS_COMPRESSION:+--initramfs-compression "$INITRAMFS_COMPRESSION"} \
 	--cache false \
 	${BOOTAPPEND_LIVE:+--bootappend-live "$BOOTAPPEND_LIVE"} \
 	$OPTS \
@@ -825,14 +835,11 @@ lb config noauto \
 
 echo "LB_CHROOT_HOOKS=\"$CHROOT_HOOKS\"" >> config/chroot
 echo "SUBPROJECT=\"${SUBPROJECT:-}\"" >> config/chroot
+echo "LB_DISTRIBUTION=\"$SUITE\"" >> config/chroot
 echo "LB_BINARY_HOOKS=\"$BINARY_HOOKS\"" >> config/binary
 echo "BUILDSTAMP=\"$NOW\"" >> config/binary
 echo "SUBPROJECT=\"${SUBPROJECT:-}\"" >> config/binary
-if [ "${SUBPROJECT:-}" = minimized ]; then
-	# try building minimized images in a 1GiB image but still allow overriding
-	# IMAGE_SIZE in lb build
-	echo 'IMAGE_SIZE=${IMAGE_SIZE:-'$((1024*1024*1024))'}' >> config/binary
-fi
+echo "LB_DISTRIBUTION=\"$SUITE\"" >> config/binary
 
 case $ARCH+$SUBARCH in
 	armhf+raspi2)
