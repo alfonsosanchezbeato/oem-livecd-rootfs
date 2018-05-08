@@ -5,7 +5,7 @@
 
 set -x
 
-echo "99-update-packagelist.binary"
+echo "031-update-packagelist.binary"
 
 . config/functions
 
@@ -29,10 +29,10 @@ chroot $SQUASH_ROOT apt-get -y install git
 
 chroot $SQUASH_ROOT sh -c '
 set -x;
-git clone https://github.com/woodrow-shen/ubuntu-manifest-parse.git
-cd ubuntu-manifest-parse
+git clone https://github.com/Lyoncore/oem-ubuntu-cdimage.git -b oem-bionic-base
+cd oem-ubuntu-cdimage/preloadftp
 ./merge-packagelist.sh
 '
-cp $SQUASH_ROOT/ubuntu-manifest-parse/bionic-classic.list ${PWD}
+cp $SQUASH_ROOT/oem-ubuntu-cdimage/preloadftp/bionic-classic.list ${PWD}
 
 teardown_mountpoint "$SQUASH_ROOT"
