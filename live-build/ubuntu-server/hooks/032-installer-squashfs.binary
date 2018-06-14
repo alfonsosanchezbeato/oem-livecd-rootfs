@@ -66,8 +66,18 @@ chroot $SQUASH_ROOT apt-get -y install user-setup curtin lupin-casper
 # "helpful" casper script that mounts any swap partitions it finds.
 rm -f $SQUASH_ROOT/usr/share/initramfs-tools/scripts/casper-bottom/*swap
 
+# Disable intel-microcode in the build time
+if [ -f $SQUASH_ROOT/etc/default/intel-microcode ];then
+	echo "IUCODE_TOOL_INITRAMFS=no" >> $SQUASH_ROOT/etc/default/intel-microcode
+fi
+
 # Installing casper means we need a new initramfs
 UPDATE_INITRAMFS_OPTIONS=CASPER_GENERATE_UUID=1 recreate_initramfs $SQUASH_ROOT
+
+# Clean the intel-microcode config
+if [ -f $SQUASH_ROOT/etc/default/intel-microcode ];then
+	sed -i "$ d" $SQUASH_ROOT/etc/default/intel-microcode
+fi
 
 # Don't let cloud-init run in the live session.
 touch $SQUASH_ROOT/etc/cloud/cloud-init.disabled
