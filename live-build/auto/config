@@ -754,6 +754,11 @@ case $ARCH in
 				# add hook script for snapdragon
 				add_chroot_hook 999-snapdragon-fixes
 				;;
+			generic)
+				COMPONENTS='main restricted universe multiverse'
+				add_package install linux-image-generic
+				BINARY_REMOVE_LINUX=false
+				;;
 		esac
 		;;
 	armel|armhf)
